@@ -17,6 +17,7 @@ const Coordinats = () => {
   const [startGEOcoding, setStartGeocoding] = useState<boolean>(false);
 
   const [timer, setTimer] = useState<number>(0);
+  const [renderString, setRenderString] = useState<string | null>(null);
 
   const count = useSelector((state: RootState) => state.counter.count);
   const myCount = useSelector((state: RootState) => state.counter.myCount);
@@ -38,7 +39,6 @@ const Coordinats = () => {
       dispatch(upCount());
       intervalId = BackgroundTimer.setInterval(() => {
         dispatch(upCount());
-        dispatch(pushGeoDates({latitude, longitude}));
       }, 5000);
       setTimer(intervalId);
     } else {
@@ -47,9 +47,14 @@ const Coordinats = () => {
       dispatch(clearMyCount());
       dispatch(setLatitude(0));
       dispatch(setLongitude(0));
+      setRenderString('Render');
     }
     return () => {
       BackgroundTimer.clearInterval(timer);
+      pushGeoDates({
+        latitude: 1111111,
+        longitude: 111111,
+      });
     };
   }, [dispatch, startGEOcoding]);
 
@@ -61,6 +66,13 @@ const Coordinats = () => {
         .then(location => {
           dispatch(setLatitude(location.latitude));
           dispatch(setLongitude(location.longitude));
+          dispatch(
+            pushGeoDates({
+              latitude: location.latitude,
+              longitude: location.longitude,
+            }),
+          );
+          console.log('adsad', geoDateArray);
         })
         .catch(error => {
           const {code, message} = error;
@@ -90,12 +102,15 @@ const Coordinats = () => {
       <Text>{startGEOcoding.toString()}</Text>
       {geoDateArray.map(
         (el: {latitude: number; longitude: number}, id: number) => {
-          <View key={id}>
-            <Text>{el.latitude}</Text>
-            <Text>{el.longitude}</Text>;
-          </View>;
+          return (
+            <View key={id}>
+              <Text>{el.latitude}</Text>
+              <Text>{el.longitude}</Text>;
+            </View>
+          );
         },
       )}
+      {renderString && <Text>{renderString}</Text>}
     </View>
   );
 };
