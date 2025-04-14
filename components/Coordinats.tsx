@@ -1,17 +1,17 @@
-import {useEffect, useState} from 'react';
-import {View, Text, Button} from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, Button } from 'react-native';
 import GetLocation from 'react-native-get-location';
 import BackgroundTimer from 'react-native-background-timer';
-import {useDispatch, useSelector} from 'react-redux';
-import {setLatitude, setLongitude} from './store/coordinatsObjectSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { setLatitude, setLongitude } from './store/coordinatsObjectSlice';
 import {
   upCount,
   upMyCount,
   clearCount,
   clearMyCount,
 } from './store/counterSlice';
-import {pushGeoDates} from './store/coordinatsArray';
-import type {RootState} from './store/store';
+import { pushGeoDates } from './store/coordinatsArray';
+import type { RootState } from './store/store';
 
 const Coordinats = () => {
   const [startGEOcoding, setStartGeocoding] = useState<boolean>(false);
@@ -51,15 +51,11 @@ const Coordinats = () => {
     }
     return () => {
       BackgroundTimer.clearInterval(timer);
-      pushGeoDates({
-        latitude: 1111111,
-        longitude: 111111,
-      });
     };
   }, [dispatch, startGEOcoding]);
 
   useEffect(() => {
-    if (count > 0) {
+    if (count > 0 && startGEOcoding) {
       GetLocation.getCurrentPosition({
         enableHighAccuracy: true,
       })
@@ -75,19 +71,14 @@ const Coordinats = () => {
           console.log('adsad', geoDateArray);
         })
         .catch(error => {
-          const {code, message} = error;
+          const { code, message } = error;
           console.warn(code, message);
         });
       dispatch(upMyCount());
-    } else {
-      dispatch(setLatitude(0));
-      dispatch(setLongitude(0));
-      return () => {
-        dispatch(setLatitude(0));
-        dispatch(setLongitude(0));
-      };
     }
   }, [dispatch, count]);
+
+
 
   return (
     <View>
@@ -100,7 +91,7 @@ const Coordinats = () => {
         onPress={() => setStartGeocoding(!startGEOcoding)}
       />
       {geoDateArray.map(
-        (el: {latitude: number; longitude: number}, id: number) => {
+        (el: { latitude: number; longitude: number }, id: number) => {
           return (
             <View key={id}>
               <Text>{el.latitude}</Text>
