@@ -9,7 +9,6 @@ function App(): React.JSX.Element {
     <Provider store={store}>
       <View style={styles.wrapper}>
         <Coordinates />
-        <Text style={{height: 90}}>Hello world</Text>
       </View>
     </Provider>
   );

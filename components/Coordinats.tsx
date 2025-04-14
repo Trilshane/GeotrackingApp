@@ -99,18 +99,16 @@ const Coordinats = () => {
         title={!startGEOcoding ? 'Начать' : 'Закончить'}
         onPress={() => setStartGeocoding(!startGEOcoding)}
       />
-      <Text>{startGEOcoding.toString()}</Text>
       {geoDateArray.map(
         (el: {latitude: number; longitude: number}, id: number) => {
           return (
             <View key={id}>
               <Text>{el.latitude}</Text>
-              <Text>{el.longitude}</Text>;
+              <Text>{el.longitude}</Text>
             </View>
           );
         },
       )}
-      {renderString && <Text>{renderString}</Text>}
     </View>
   );
 };
