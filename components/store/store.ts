@@ -1,9 +1,13 @@
 import {configureStore} from '@reduxjs/toolkit';
 import counterReducer from './counterSlice';
+import coordinatsObjectReducer from './coordinatsObjectSlice';
+import coordinatsArrayReducer from './coordinatsArray';
 
 const store = configureStore({
   reducer: {
     counter: counterReducer,
+    coordinatsObject: coordinatsObjectReducer,
+    coordinatsArray: coordinatsArrayReducer,
   },
 });
 
