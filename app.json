@@ -2,6 +2,14 @@
   "expo": {
     "name": "GeoTrackingApp",
     "slug": "GeoTrackingApp",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "extra": {
+      "eas": {
+        "projectId": "5206a255-fe0b-4d30-9789-7e26706dbd18"
+      }
+    },
+    "android": {
+      "package": "com.trilshane1.GeoTrackingApp"
+    }
   }
 }
