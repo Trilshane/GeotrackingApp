@@ -100,16 +100,6 @@ const Coordinates = () => {
         title={!startGEOcoding ? "Начать" : "Закончить"}
         onPress={() => setStartGeocoding(!startGEOcoding)}
       />
-      {/* {geoDateArray.map(
-        (el: { latitude: number; longitude: number }, id: number) => {
-          return (
-            <View key={id}>
-              <Text>{el.latitude}</Text>
-              <Text>{el.longitude}</Text>
-            </View>
-          );
-        }
-      )} */}
     </View>
   );
 };

@@ -15,6 +15,9 @@ const Map = () => {
 
   const [loading, setLoading] = useState(false);
   const [arr, setArr] = useState(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+  const [latitude, setLatitude] = useState<number | null>(null);
+
   useEffect(() => {
     if (geoDateArray.length > 1) {
       setLoading(true);
@@ -33,9 +36,9 @@ const Map = () => {
           nightMode={true}
           mapType={"vector"}
           initialRegion={{
-            lat: 30,
-            lon: 30,
-            zoom: 7,
+            lat: geoDateArray.length > 0 ? geoDateArray[0].lat : 50,
+            lon: geoDateArray.length > 0 ? geoDateArray[0].lon : 50,
+            zoom: 15,
             azimuth: 0,
           }}
           style={styles.mapStyle}
