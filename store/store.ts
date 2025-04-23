@@ -1,13 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import counterReducer from "./counterSlice";
 import coordinatesObjectReducer from "./coordinatesObjectSlice";
-import coordinatesArrayReducer from "./coordinatesArray";
+import coordinatesArrayReducer from "./coordinatesArraySlice";
+import routeDataSliceReducer from "./routeDataSlice";
 
 const store = configureStore({
   reducer: {
-    counter: counterReducer,
     coordinatesObject: coordinatesObjectReducer,
     coordinatesArray: coordinatesArrayReducer,
+    routeData: routeDataSliceReducer,
   },
 });
 

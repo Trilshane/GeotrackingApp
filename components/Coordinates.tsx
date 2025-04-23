@@ -5,25 +5,18 @@ import * as TaskManager from "expo-task-manager";
 import { useDispatch, useSelector } from "react-redux";
 import { setLatitude, setLongitude } from "../store/coordinatesObjectSlice";
 import {
-  upCount,
-  upMyCount,
-  clearCount,
-  clearMyCount,
-} from "../store/counterSlice";
-import {
   pushGeoDates,
   clearCoordinatesArray,
   getDistance,
   clearDistance,
-} from "../store/coordinatesArray";
+  setDataInBackend,
+} from "../store/coordinatesArraySlice";
 import type { RootState } from "../store/store";
 
 const Coordinates = () => {
   const [startGEOcoding, setStartGeocoding] = useState<boolean>(false);
   const [componentDistance, setComponentDistance] = useState<string>("");
 
-  const count = useSelector((state: RootState) => state.counter.count);
-  const myCount = useSelector((state: RootState) => state.counter.myCount);
   const latitude = useSelector(
     (state: RootState) => state.coordinatesObject.lat
   );
@@ -65,7 +58,6 @@ const Coordinates = () => {
             dispatch(setLongitude(newCoords.lon));
             dispatch(pushGeoDates(newCoords));
             dispatch(getDistance());
-            console.log(newCoords);
           }
         );
         // Handler for changing geolocation
@@ -87,6 +79,7 @@ const Coordinates = () => {
         console.log("geoDateArray", geoDateArray);
         console.log("distance", distance);
         setComponentDistance(distance);
+        dispatch(setDataInBackend());
       }
     }
   }, [startGEOcoding]);
@@ -98,7 +91,9 @@ const Coordinates = () => {
       {componentDistance && <Text>Дистанция {componentDistance} м</Text>}
       <Button
         title={!startGEOcoding ? "Начать" : "Закончить"}
-        onPress={() => setStartGeocoding(!startGEOcoding)}
+        onPress={() => {
+          setStartGeocoding(!startGEOcoding);
+        }}
       />
     </View>
   );

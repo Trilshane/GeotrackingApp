@@ -9,14 +9,9 @@ const Map = () => {
   const geoDateArray = useSelector(
     (state: RootState) => state.coordinatesArray.coordinatesArray
   );
-  const distance = useSelector(
-    (state: RootState) => state.coordinatesArray.distance
-  );
 
   const [loading, setLoading] = useState(false);
   const [arr, setArr] = useState(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
-  const [latitude, setLatitude] = useState<number | null>(null);
 
   useEffect(() => {
     if (geoDateArray.length > 1) {
@@ -34,7 +29,6 @@ const Map = () => {
           showUserPosition={false}
           rotateGesturesEnabled={false}
           nightMode={true}
-          mapType={"vector"}
           initialRegion={{
             lat: geoDateArray.length > 0 ? geoDateArray[0].lat : 50,
             lon: geoDateArray.length > 0 ? geoDateArray[0].lon : 50,
@@ -45,8 +39,7 @@ const Map = () => {
         >
           <Polyline
             points={arr}
-            fillColor="#5789d9"
-            strokeColor="#154ca3"
+            strokeColor="#ff5500"
             strokeWidth={4}
             zIndex={4}
           />

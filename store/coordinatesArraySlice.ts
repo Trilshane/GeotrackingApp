@@ -1,14 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface CoordinatesObjectType {
-  lat: number;
-  lon: number;
-}
-
-interface CoordinatesArrayType {
-  coordinatesArray: CoordinatesObjectType[];
-  distance: string;
-}
+import axios from "axios";
+import {
+  CoordinatesArrayType,
+  CoordinatesObjectType,
+} from "../types/reduxTypes";
 
 const initialState: CoordinatesArrayType = {
   coordinatesArray: [],
@@ -53,8 +48,28 @@ function deg2rad(deg: number) {
   return deg * (Math.PI / 180);
 }
 
+function setArrayDataInBackend(
+  array: CoordinatesObjectType[],
+  distance: string
+) {
+  axios
+    .post("http://83.222.24.50/api/v1/report/", {
+      route: array,
+      distance: distance,
+    })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        console.log("ошибка");
+      }
+    })
+    .then((response) => console.log(response))
+    .catch((error) => console.error(error));
+}
+
 const coordinatesArraySlice = createSlice({
-  name: "coordinatsArray",
+  name: "coordinatesArray",
   initialState,
   reducers: {
     pushGeoDates(state, action: PayloadAction<CoordinatesObjectType>) {
@@ -69,6 +84,9 @@ const coordinatesArraySlice = createSlice({
     clearDistance: (state) => {
       state.distance = "";
     },
+    setDataInBackend: (state) => {
+      setArrayDataInBackend(state.coordinatesArray, state.distance);
+    },
   },
 });
 
@@ -77,6 +95,7 @@ export const {
   clearCoordinatesArray,
   getDistance,
   clearDistance,
+  setDataInBackend,
 } = coordinatesArraySlice.actions;
 
 export default coordinatesArraySlice.reducer;

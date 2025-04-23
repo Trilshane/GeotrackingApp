@@ -1,9 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface CoordinatesObjectType {
-  lon: number;
-  lat: number;
-}
+import { CoordinatesObjectType } from "../types/reduxTypes";
 
 const initialState: CoordinatesObjectType = {
   lat: 0,
