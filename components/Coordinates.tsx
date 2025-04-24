@@ -48,7 +48,7 @@ const Coordinates = () => {
         }
         TaskManager.defineTask(
           "WATCH_BG_GEO",
-          ({ data: { locations }, error }) => {
+          ({ data: { locations }, error }: any): any => {
             if (error) return;
             const newCoords = {
               lat: locations[0].coords.latitude,

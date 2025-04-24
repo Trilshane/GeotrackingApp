@@ -14,6 +14,13 @@ export interface CounterState {
 }
 
 export interface GetRoteDataType {
-  data: CoordinatesObjectType[];
-  statusLoaded: boolean;
+  data: RouteDataTypes[];
+  statusLoaded: string;
+}
+
+export interface RouteDataTypes {
+  id: number;
+  date: string;
+  distance: string | number;
+  route: CoordinatesObjectType[];
 }

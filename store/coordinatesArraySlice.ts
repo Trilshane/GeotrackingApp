@@ -48,23 +48,29 @@ function deg2rad(deg: number) {
   return deg * (Math.PI / 180);
 }
 
+function getTodayDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
 function setArrayDataInBackend(
   array: CoordinatesObjectType[],
   distance: string
 ) {
+  const dataObj = {
+    id: 1,
+    route: array,
+    distance: distance,
+    date: getTodayDate(),
+  };
+
+  const data = JSON.stringify(dataObj);
   axios
-    .post("http://83.222.24.50/api/v1/report/", {
-      route: array,
-      distance: distance,
+    .post("http://83.222.24.50/api/v1/report/", data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
-    .then((response) => {
-      if (response.status === 200) {
-        return response.data;
-      } else {
-        console.log("ошибка");
-      }
-    })
-    .then((response) => console.log(response))
+    .then((response) => console.log("response ALL", response.data))
     .catch((error) => console.error(error));
 }
 

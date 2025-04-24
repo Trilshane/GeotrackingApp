@@ -1,34 +1,43 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { GetRoteDataType } from "../types/reduxTypes";
+import { GetRoteDataType, RouteDataTypes } from "../types/reduxTypes";
 import axios from "axios";
 
 const initialState: GetRoteDataType = {
   data: [],
-  statusLoaded: false,
+  statusLoaded: "loading",
 };
 
-export const fetchData = createAsyncThunk("data/fetchData", async () => {
-  const { data } = await axios.get("http://83.222.24.50/api/v1/report/");
-  return data;
-});
+export const fetchData: any = createAsyncThunk(
+  "routeData/fetchRoutes",
+  async () => {
+    const { data } = await axios.get("http://83.222.24.50/api/v1/report/");
+    return data;
+  }
+);
 
 const routeDataSlice = createSlice({
   name: "routeData",
   initialState,
   reducers: {
-    setData(state, action) {
-      state.data = action.payload;
+    clearData(state) {
+      state.data = [];
+      state.statusLoaded = "loading";
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchData.fulfilled, (state, action) => {
-      state.data = action.payload;
-      if (action.payload.status === "ok") {
-        state.statusLoaded = true;
-      }
-    });
+    builder
+      .addCase(fetchData.pending, (state) => {
+        state.statusLoaded = "loading";
+      })
+      .addCase(
+        fetchData.fulfilled,
+        (state, action: PayloadAction<RouteDataTypes[]>) => {
+          state.statusLoaded = "loaded";
+          state.data = action.payload;
+        }
+      );
   },
 });
 
-export const { setData } = routeDataSlice.actions;
+export const { clearData } = routeDataSlice.actions;
 export default routeDataSlice.reducer;
