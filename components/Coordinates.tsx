@@ -3,12 +3,15 @@ import { View, Text, Button } from "react-native";
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
 import { useDispatch, useSelector } from "react-redux";
-import { setLatitude, setLongitude } from "../store/coordinatesObjectSlice";
+import {
+  setLatitude,
+  setLongitude,
+  clearCoordinates,
+} from "../store/coordinatesObjectSlice";
 import {
   pushGeoDates,
-  clearCoordinatesArray,
   getDistance,
-  clearDistance,
+  clearDataCoordinatesArray,
   setDataInBackend,
 } from "../store/coordinatesArraySlice";
 import type { RootState } from "../store/store";
@@ -34,10 +37,8 @@ const Coordinates = () => {
 
   useEffect(() => {
     if (startGEOcoding) {
-      dispatch(clearCoordinatesArray());
-      dispatch(setLatitude(0));
-      dispatch(setLongitude(0));
-      dispatch(clearDistance());
+      dispatch(clearCoordinates());
+      dispatch(clearDataCoordinatesArray());
       setComponentDistance("");
       (async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
@@ -76,8 +77,6 @@ const Coordinates = () => {
     } else {
       Location.stopLocationUpdatesAsync("WATCH_BG_GEO");
       if (geoDateArray.length > 1) {
-        console.log("geoDateArray", geoDateArray);
-        console.log("distance", distance);
         setComponentDistance(distance);
         dispatch(setDataInBackend());
       }

@@ -5,8 +5,8 @@ const RoutesLoader = () => {
 
   return (
     <View style={styles.container}>
-      {arr.map((el, i) => {
-        return <View style={styles.elem} key={i}></View>;
+      {arr.map((el) => {
+        return <View style={styles.elem} key={el}></View>;
       })}
     </View>
   );

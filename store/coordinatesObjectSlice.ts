@@ -16,9 +16,14 @@ const coordinatesObjectSlice = createSlice({
     setLongitude(state, action: PayloadAction<number>) {
       state.lon = action.payload;
     },
+    clearCoordinates: (state) => {
+      state.lat = 0;
+      state.lon = 0;
+    },
   },
 });
 
-export const { setLongitude, setLatitude } = coordinatesObjectSlice.actions;
+export const { setLongitude, setLatitude, clearCoordinates } =
+  coordinatesObjectSlice.actions;
 
 export default coordinatesObjectSlice.reducer;

@@ -29,8 +29,8 @@ function getDistanceFromLatLonInKm(
   lat2: number,
   lon2: number
 ) {
-  const R = 6371; // Radius of the earth in km
-  const dLat = deg2rad(lat2 - lat1); // deg2rad below
+  const R = 6371;
+  const dLat = deg2rad(lat2 - lat1);
   const dLon = deg2rad(lon2 - lon1);
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -39,8 +39,9 @@ function getDistanceFromLatLonInKm(
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const d = R * c; // Distance in km
+  const d = R * c;
 
+  //возвращаем дистанцию в метрах
   return d * 1000;
 }
 
@@ -64,6 +65,7 @@ function setArrayDataInBackend(
   };
 
   const data = JSON.stringify(dataObj);
+
   axios
     .post("http://83.222.24.50/api/v1/report/", data, {
       headers: {
@@ -84,10 +86,8 @@ const coordinatesArraySlice = createSlice({
     getDistance: (state) => {
       state.distance = getDistanceFn(state.coordinatesArray);
     },
-    clearCoordinatesArray: (state) => {
+    clearDataCoordinatesArray: (state) => {
       state.coordinatesArray = [];
-    },
-    clearDistance: (state) => {
       state.distance = "";
     },
     setDataInBackend: (state) => {
@@ -98,9 +98,8 @@ const coordinatesArraySlice = createSlice({
 
 export const {
   pushGeoDates,
-  clearCoordinatesArray,
+  clearDataCoordinatesArray,
   getDistance,
-  clearDistance,
   setDataInBackend,
 } = coordinatesArraySlice.actions;
 
