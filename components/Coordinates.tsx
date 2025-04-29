@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, Alert } from "react-native";
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,13 +12,18 @@ import {
   pushGeoDates,
   getDistance,
   clearDataCoordinatesArray,
-  setDataInBackend,
+  setDistanceData,
 } from "../store/coordinatesArraySlice";
 import type { RootState } from "../store/store";
+import { AppDispatch } from "../types/reduxTypes";
 
 const Coordinates = () => {
   const [startGEOcoding, setStartGeocoding] = useState<boolean>(false);
   const [componentDistance, setComponentDistance] = useState<string>("");
+
+  function getTodayDate(): string {
+    return new Date().toISOString().slice(0, 10);
+  }
 
   const latitude = useSelector(
     (state: RootState) => state.coordinatesObject.lat
@@ -32,8 +37,11 @@ const Coordinates = () => {
   const distance = useSelector(
     (state: RootState) => state.coordinatesArray.distance
   );
+  const loadStatus = useSelector(
+    (state: RootState) => state.coordinatesArray.loadedStatus
+  );
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     if (startGEOcoding) {
@@ -70,7 +78,7 @@ const Coordinates = () => {
           distanceInterval: 1,
           foregroundService: {
             notificationTitle: "GPS",
-            notificationBody: " enabled",
+            notificationBody: "enabled",
           },
         });
       })();
@@ -78,7 +86,14 @@ const Coordinates = () => {
       Location.stopLocationUpdatesAsync("WATCH_BG_GEO");
       if (geoDateArray.length > 1) {
         setComponentDistance(distance);
-        dispatch(setDataInBackend());
+        dispatch(
+          setDistanceData({
+            id: 1,
+            route: geoDateArray,
+            distance: distance,
+            date: getTodayDate(),
+          })
+        );
       }
     }
   }, [startGEOcoding]);
@@ -94,6 +109,19 @@ const Coordinates = () => {
           setStartGeocoding(!startGEOcoding);
         }}
       />
+      <>
+        {loadStatus &&
+          Alert.alert(
+            "Маршрут сохранен",
+            "Для просмотра маршрутов, перейдите во вкладку 'маршруты'",
+            [
+              {
+                text: "OK",
+                onPress: () => dispatch(clearDataCoordinatesArray()),
+              },
+            ]
+          )}
+      </>
     </View>
   );
 };

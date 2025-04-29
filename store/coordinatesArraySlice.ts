@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import {
   CoordinatesArrayType,
@@ -8,7 +8,32 @@ import {
 const initialState: CoordinatesArrayType = {
   coordinatesArray: [],
   distance: "",
+  loadedStatus: false,
 };
+
+interface credentialsType {
+  id: number;
+  route: CoordinatesObjectType[];
+  distance: string;
+  date: string;
+}
+
+export const setDistanceData = createAsyncThunk(
+  "coordinatesArray/setDistance",
+  async (credentials: credentialsType): Promise<number> => {
+    const response = await axios.post(
+      "http://83.222.24.50/api/v1/report/",
+      JSON.stringify(credentials),
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = response.status;
+    return data;
+  }
+);
 
 function getDistanceFn(array: CoordinatesObjectType[]): string {
   let distance: number = 0;
@@ -28,7 +53,7 @@ function getDistanceFromLatLonInKm(
   lon1: number,
   lat2: number,
   lon2: number
-) {
+): number {
   const R = 6371;
   const dLat = deg2rad(lat2 - lat1);
   const dLon = deg2rad(lon2 - lon1);
@@ -49,33 +74,6 @@ function deg2rad(deg: number) {
   return deg * (Math.PI / 180);
 }
 
-function getTodayDate(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function setArrayDataInBackend(
-  array: CoordinatesObjectType[],
-  distance: string
-) {
-  const dataObj = {
-    id: 1,
-    route: array,
-    distance: distance,
-    date: getTodayDate(),
-  };
-
-  const data = JSON.stringify(dataObj);
-
-  axios
-    .post("http://83.222.24.50/api/v1/report/", data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-    .then((response) => console.log("response ALL", response.data))
-    .catch((error) => console.error(error));
-}
-
 const coordinatesArraySlice = createSlice({
   name: "coordinatesArray",
   initialState,
@@ -89,18 +87,21 @@ const coordinatesArraySlice = createSlice({
     clearDataCoordinatesArray: (state) => {
       state.coordinatesArray = [];
       state.distance = "";
+      state.loadedStatus = false;
     },
-    setDataInBackend: (state) => {
-      setArrayDataInBackend(state.coordinatesArray, state.distance);
-    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(setDistanceData.pending, (state) => {
+        state.loadedStatus = false;
+      })
+      .addCase(setDistanceData.fulfilled, (state) => {
+        state.loadedStatus = true;
+      });
   },
 });
 
-export const {
-  pushGeoDates,
-  clearDataCoordinatesArray,
-  getDistance,
-  setDataInBackend,
-} = coordinatesArraySlice.actions;
+export const { pushGeoDates, clearDataCoordinatesArray, getDistance } =
+  coordinatesArraySlice.actions;
 
 export default coordinatesArraySlice.reducer;

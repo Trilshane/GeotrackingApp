@@ -1,3 +1,7 @@
+import store from "../store/store";
+
+export type AppDispatch = typeof store.dispatch;
+
 export interface CoordinatesObjectType {
   lat: number;
   lon: number;
@@ -6,6 +10,7 @@ export interface CoordinatesObjectType {
 export interface CoordinatesArrayType {
   coordinatesArray: CoordinatesObjectType[];
   distance: string;
+  loadedStatus: boolean;
 }
 
 export interface CounterState {
