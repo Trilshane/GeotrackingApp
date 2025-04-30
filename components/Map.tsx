@@ -1,4 +1,4 @@
-import { Polygon, Polyline, YaMap } from "react-native-yamap";
+import { Polyline, YaMap } from "react-native-yamap";
 import { StyleSheet } from "react-native";
 import { vw, vh } from "react-native-expo-viewport-units";
 import { useSelector } from "react-redux";

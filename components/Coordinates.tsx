@@ -15,7 +15,7 @@ import {
   setDistanceData,
 } from "../store/coordinatesArraySlice";
 import type { RootState } from "../store/store";
-import { AppDispatch } from "../types/reduxTypes";
+import { AppDispatch, CoordinatesObjectType } from "../types/reduxTypes";
 
 const Coordinates = () => {
   const [startGEOcoding, setStartGeocoding] = useState<boolean>(false);
@@ -59,13 +59,36 @@ const Coordinates = () => {
           "WATCH_BG_GEO",
           ({ data: { locations }, error }: any): any => {
             if (error) return;
-            const newCoords = {
+            const newCoords: CoordinatesObjectType = {
               lat: locations[0].coords.latitude,
               lon: locations[0].coords.longitude,
             };
             dispatch(setLatitude(newCoords.lat));
             dispatch(setLongitude(newCoords.lon));
-            dispatch(pushGeoDates(newCoords));
+            if (geoDateArray.length > 0) {
+              if (geoDateArray.length < 2) {
+                if (
+                  (geoDateArray.at(-1).lat - newCoords.lat >= 0.001 ||
+                    newCoords.lat - geoDateArray.at(-1).lat >= 0.001) &&
+                  (geoDateArray.at(-1).lon - newCoords.lon >= 0.001 ||
+                    newCoords.lon - geoDateArray.at(-1).lon >= 0.001)
+                ) {
+                  geoDateArray.shift();
+                }
+              } else {
+                if (
+                  (geoDateArray.at(-1).lat - newCoords.lat <= 0.001 ||
+                    newCoords.lat - geoDateArray.at(-1).lat <= 0.001) &&
+                  (geoDateArray.at(-1).lon - newCoords.lon <= 0.001 ||
+                    newCoords.lon - geoDateArray.at(-1).lon <= 0.001)
+                ) {
+                  dispatch(pushGeoDates(newCoords));
+                } else {
+                }
+              }
+            } else {
+              dispatch(pushGeoDates(newCoords));
+            }
             dispatch(getDistance());
           }
         );
@@ -73,7 +96,7 @@ const Coordinates = () => {
         Location.startLocationUpdatesAsync("WATCH_BG_GEO", {
           accuracy: Location.Accuracy.BestForNavigation,
           showsBackgroundLocationIndicator: true,
-          timeInterval: 15000,
+          timeInterval: 5000,
           activityType: Location.ActivityType.AutomotiveNavigation,
           distanceInterval: 1,
           foregroundService: {
