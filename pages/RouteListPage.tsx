@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { View, StyleSheet, Text, ScrollView } from "react-native";
+import { useEffect } from "react";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/store";
 import { fetchData, clearData } from "../store/routeDataSlice";
-import { RouteDataTypes } from "../types/reduxTypes";
 import RouteItem from "../components/RouteItem";
 import RoutesLoader from "../components/RoutesLoader";
+import { AppDispatch } from "../types/reduxTypes";
 
 const RouteListPage = () => {
   const backendData = useSelector((state: RootState) => state.routeData.data);
@@ -13,7 +13,7 @@ const RouteListPage = () => {
     (state: RootState) => state.routeData.statusLoaded
   );
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     dispatch(fetchData());

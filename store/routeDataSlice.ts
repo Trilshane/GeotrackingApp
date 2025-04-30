@@ -7,10 +7,13 @@ const initialState: GetRoteDataType = {
   statusLoaded: "loading",
 };
 
-export const fetchData = createAsyncThunk("routeData/fetchRoutes", async () => {
-  const { data } = await axios.get("http://83.222.24.50/api/v1/report/");
-  return data;
-});
+export const fetchData = createAsyncThunk(
+  "routeData/fetchRoutes",
+  async (): Promise<RouteDataTypes[]> => {
+    const { data } = await axios.get("http://83.222.24.50/api/v1/report/");
+    return data;
+  }
+);
 
 const routeDataSlice = createSlice({
   name: "routeData",
