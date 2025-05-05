@@ -17,6 +17,8 @@ import {
 import type { RootState } from "../store/store";
 import { AppDispatch, CoordinatesObjectType } from "../types/reduxTypes";
 
+import store from "../store/store";
+
 const Coordinates = () => {
   const [startGEOcoding, setStartGeocoding] = useState<boolean>(false);
   const [componentDistance, setComponentDistance] = useState<string>("");
@@ -43,6 +45,32 @@ const Coordinates = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
+  function getDistanceFromLatLonInKm(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ): number {
+    const R = 6371;
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) *
+        Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c;
+
+    //возвращаем дистанцию в метрах
+    return d * 1000;
+  }
+
+  function deg2rad(deg: number) {
+    return deg * (Math.PI / 180);
+  }
+
   useEffect(() => {
     if (startGEOcoding) {
       dispatch(clearCoordinates());
@@ -55,38 +83,73 @@ const Coordinates = () => {
           console.error("Permission to access location was denied");
           return;
         }
+
         TaskManager.defineTask(
           "WATCH_BG_GEO",
           ({ data: { locations }, error }: any): any => {
             if (error) return;
+
+            const currentStateCoordinatesArray =
+              store.getState().coordinatesArray.coordinatesArray;
+
             const newCoords: CoordinatesObjectType = {
               lat: locations[0].coords.latitude,
               lon: locations[0].coords.longitude,
             };
             dispatch(setLatitude(newCoords.lat));
             dispatch(setLongitude(newCoords.lon));
-            if (geoDateArray.length > 0) {
-              if (geoDateArray.length < 2) {
+
+            if (currentStateCoordinatesArray.length > 0) {
+              if (currentStateCoordinatesArray.length < 2) {
                 if (
-                  (geoDateArray.at(-1).lat - newCoords.lat >= 0.001 ||
-                    newCoords.lat - geoDateArray.at(-1).lat >= 0.001) &&
-                  (geoDateArray.at(-1).lon - newCoords.lon >= 0.001 ||
-                    newCoords.lon - geoDateArray.at(-1).lon >= 0.001)
+                  getDistanceFromLatLonInKm(
+                    +currentStateCoordinatesArray.at(-1).lat,
+                    +currentStateCoordinatesArray.at(-1).lon,
+                    +newCoords.lat,
+                    +newCoords.lon
+                  ) >= 100
                 ) {
-                  geoDateArray.shift();
+                  dispatch(clearDataCoordinatesArray());
+                  console.warn("33 33 33");
+                  console.warn(
+                    "дистанция",
+                    getDistanceFromLatLonInKm(
+                      +currentStateCoordinatesArray.at(-1).lat,
+                      +currentStateCoordinatesArray.at(-1).lon,
+                      +newCoords.lat,
+                      +newCoords.lon
+                    )
+                  );
+                } else {
+                  dispatch(pushGeoDates(newCoords));
+                  console.warn("55 55 55");
                 }
               } else {
                 if (
-                  (geoDateArray.at(-1).lat - newCoords.lat <= 0.001 ||
-                    newCoords.lat - geoDateArray.at(-1).lat <= 0.001) &&
-                  (geoDateArray.at(-1).lon - newCoords.lon <= 0.001 ||
-                    newCoords.lon - geoDateArray.at(-1).lon <= 0.001)
+                  getDistanceFromLatLonInKm(
+                    +currentStateCoordinatesArray.at(-1).lat,
+                    +currentStateCoordinatesArray.at(-1).lon,
+                    +newCoords.lat,
+                    +newCoords.lon
+                  ) <= 100
                 ) {
+                  console.warn("11 11 11");
+                  console.warn(
+                    "дистанция",
+                    getDistanceFromLatLonInKm(
+                      +currentStateCoordinatesArray.at(-1).lat,
+                      +currentStateCoordinatesArray.at(-1).lon,
+                      +newCoords.lat,
+                      +newCoords.lon
+                    )
+                  );
                   dispatch(pushGeoDates(newCoords));
                 } else {
+                  console.warn("22 22 22");
                 }
               }
             } else {
+              console.warn("44 44 44");
               dispatch(pushGeoDates(newCoords));
             }
             dispatch(getDistance());
@@ -96,7 +159,7 @@ const Coordinates = () => {
         Location.startLocationUpdatesAsync("WATCH_BG_GEO", {
           accuracy: Location.Accuracy.BestForNavigation,
           showsBackgroundLocationIndicator: true,
-          timeInterval: 5000,
+          timeInterval: 2000,
           activityType: Location.ActivityType.AutomotiveNavigation,
           distanceInterval: 1,
           foregroundService: {
@@ -108,6 +171,7 @@ const Coordinates = () => {
     } else {
       Location.stopLocationUpdatesAsync("WATCH_BG_GEO");
       if (geoDateArray.length > 1) {
+        // setCount(0);
         setComponentDistance(distance);
         dispatch(
           setDistanceData({
@@ -119,7 +183,7 @@ const Coordinates = () => {
         );
       }
     }
-  }, [startGEOcoding]);
+  }, [startGEOcoding, dispatch]);
 
   return (
     <View>
@@ -150,3 +214,12 @@ const Coordinates = () => {
 };
 
 export default Coordinates;
+
+// (currentStateCoordinatesArray.at(-1).lat - newCoords.lat >=
+//   0.0005 ||
+//   newCoords.lat - currentStateCoordinatesArray.at(-1).lat >=
+//     0.0005) &&
+// (currentStateCoordinatesArray.at(-1).lon - newCoords.lon >=
+//   0.0005 ||
+//   newCoords.lon - currentStateCoordinatesArray.at(-1).lon >=
+//     0.0005)
