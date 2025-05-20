@@ -62,13 +62,12 @@ const Coordinates = () => {
         Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const d = R * c;
+    function deg2rad(deg: number): number {
+      return deg * (Math.PI / 180);
+    }
 
     //возвращаем дистанцию в метрах
     return d * 1000;
-  }
-
-  function deg2rad(deg: number) {
-    return deg * (Math.PI / 180);
   }
 
   useEffect(() => {
@@ -88,7 +87,6 @@ const Coordinates = () => {
           "WATCH_BG_GEO",
           ({ data: { locations }, error }: any): any => {
             if (error) return;
-
             const currentStateCoordinatesArray =
               store.getState().coordinatesArray.coordinatesArray;
 
@@ -110,19 +108,21 @@ const Coordinates = () => {
                   ) >= 100
                 ) {
                   dispatch(clearDataCoordinatesArray());
-                  console.warn("33 33 33");
                   console.warn(
-                    "дистанция",
-                    getDistanceFromLatLonInKm(
+                    "второе значение не записалось, дистанция больше 100м, массив очистился"
+                  );
+                  console.warn(
+                    `дистанция при второй записи - ${getDistanceFromLatLonInKm(
                       +currentStateCoordinatesArray.at(-1).lat,
                       +currentStateCoordinatesArray.at(-1).lon,
                       +newCoords.lat,
                       +newCoords.lon
-                    )
+                    )} м
+                  `
                   );
                 } else {
                   dispatch(pushGeoDates(newCoords));
-                  console.warn("55 55 55");
+                  console.warn("второе значение записалось");
                 }
               } else {
                 if (
@@ -133,23 +133,34 @@ const Coordinates = () => {
                     +newCoords.lon
                   ) <= 100
                 ) {
-                  console.warn("11 11 11");
+                  console.warn("данные записались");
                   console.warn(
-                    "дистанция",
-                    getDistanceFromLatLonInKm(
+                    `дистанция при изменении ползунка - ${getDistanceFromLatLonInKm(
                       +currentStateCoordinatesArray.at(-1).lat,
                       +currentStateCoordinatesArray.at(-1).lon,
                       +newCoords.lat,
                       +newCoords.lon
-                    )
+                    ).toFixed(2)} м
+                  `
                   );
                   dispatch(pushGeoDates(newCoords));
                 } else {
-                  console.warn("22 22 22");
+                  console.warn(
+                    "данные не записались, дистанция больше 100м, от предыдущего значения"
+                  );
+                  console.warn(
+                    `дистанция при изменении ползунка - ${getDistanceFromLatLonInKm(
+                      +currentStateCoordinatesArray.at(-1).lat,
+                      +currentStateCoordinatesArray.at(-1).lon,
+                      +newCoords.lat,
+                      +newCoords.lon
+                    ).toFixed(2)} м
+                  `
+                  );
                 }
               }
             } else {
-              console.warn("44 44 44");
+              console.warn("первое значение записалось");
               dispatch(pushGeoDates(newCoords));
             }
             dispatch(getDistance());
@@ -171,7 +182,6 @@ const Coordinates = () => {
     } else {
       Location.stopLocationUpdatesAsync("WATCH_BG_GEO");
       if (geoDateArray.length > 1) {
-        // setCount(0);
         setComponentDistance(distance);
         dispatch(
           setDistanceData({
@@ -214,12 +224,3 @@ const Coordinates = () => {
 };
 
 export default Coordinates;
-
-// (currentStateCoordinatesArray.at(-1).lat - newCoords.lat >=
-//   0.0005 ||
-//   newCoords.lat - currentStateCoordinatesArray.at(-1).lat >=
-//     0.0005) &&
-// (currentStateCoordinatesArray.at(-1).lon - newCoords.lon >=
-//   0.0005 ||
-//   newCoords.lon - currentStateCoordinatesArray.at(-1).lon >=
-//     0.0005)
